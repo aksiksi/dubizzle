@@ -15,11 +15,12 @@ This is still a work in progress. There is much left to do until this becomes wh
 
 # Quickstart
 
+```python
 >> import dubizzle
 >> results = dubizzle.search(country='uae', city='dubai', section='motors', num_results=100)
 >> print results
-
-```[
+>>
+[
 	{
 		'url': 'test',
 		'image': 'http://...',
