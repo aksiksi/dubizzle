@@ -7,6 +7,8 @@ become a simple and complete scraping-based API for Dubizzle.
 
 This is still a work in progress. There is much left to do until this becomes what it should be. I will however make sure that the `master` branch functions as expected. Any help would be greatly appreciated, obviously.
 
+Another thing to point out is that the main focus for the time being is on Motors search within Dubizzle.
+
 # Prerequisites
 
 * [Requests](http://docs.python-requests.org/en/latest/index.html)
