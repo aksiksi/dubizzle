@@ -131,7 +131,7 @@ class Results(object):
             page_urls.append(search_base + el['href'])
 
         # Scrape pages in parallel
-        pool = multiprocessing.Pool(processes=5)
+        pool = multiprocessing.Pool(processes=multiprocessing.cpu_count()*2)
         raw_results = []
 
         # Iterate through fetched pages and render into BS objects
@@ -191,14 +191,14 @@ class Results(object):
                 if data:
                     for each in data:
                         pair = each.text.split(': ')
-                        feature_name, feature_value = pair[0], pair[1].lower()
+                        feature_name, feature_value = pair[0].lower(), pair[1].lower()
 
-                        if feature_name in ['Kilometers', 'Year']:
+                        if feature_name in ['kilometers', 'year']:
                             if feature_value == 'none':
                                 feature_value = 0
 
                             feature_value = int(feature_value)
-                        elif feature_name == 'Doors':
+                        elif feature_name == 'doors':
                             feature_value = int(feature_value.split(' ')[0].rstrip('+'))
 
                         features[feature_name] = feature_value
