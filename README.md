@@ -43,7 +43,6 @@ Another thing to point out is that the main focus for the time being is on Motor
 ```python
 # Find average price of year 2007 and above Nissan Altimas in Dubai
 import dubizzle
-from collections import Counter
 
 results = dubizzle.search(keyword='altima', country='uae', city='dubai', section='motors',
 						  category='cars', make='nissan', min_year=2007, num_results='all')
@@ -58,6 +57,8 @@ print float(total_price) / result_count // 39239.94
 
 ```python
 # Use the above results to find distribution of post-2007 Altima colors
+from collections import Counter
+
 colors = [result['features']['color'] for result in results]
 distribution = Counter(colors)
 
