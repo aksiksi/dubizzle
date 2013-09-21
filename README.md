@@ -1,21 +1,21 @@
-# Introduction
+## Introduction
 
 [Dubizzle](http://www.dubizzle.com/) is an online classifieds website. This project aims to 
 become a simple and complete scraping-based API for Dubizzle.
 
-# Notice
+## Notice
 
 This is still a work in progress. There is much left to do until this becomes what it should be. I will however make sure that the `master` branch functions as expected. Any help would be greatly appreciated, obviously.
 
 Another thing to point out is that the main focus for the time being is on Motors search within Dubizzle.
 
-# Prerequisites
+## Prerequisites
 
 * [Requests](http://docs.python-requests.org/en/latest/index.html)
 * [BeautifulSoup](http://www.crummy.com/software/BeautifulSoup/)
 * Python 2.6+
 
-# Quickstart
+## Quickstart
 
 ```python
 >> import dubizzle
@@ -38,9 +38,27 @@ Another thing to point out is that the main focus for the time being is on Motor
 ]
 ```
 
-# Search Parameters
+## Examples
 
-## General
+### Find average price of year 2007 and above Nissan Altimas in Dubai
+
+```python
+import dubizzle
+
+results = dubizzle.search(keyword='altima', country='uae', city='dubai', section='motors',
+						  category='cars', make='nissan', min_year=2007, results='all')
+
+total_price, result_count = 0, len(results)
+
+for result in results:
+	total_price += result['price']
+
+print float(total_price) / result_count
+```
+
+## Search Parameters
+
+### General
 
 * `country` - **required**
 * `keyword`
@@ -50,7 +68,7 @@ Another thing to point out is that the main focus for the time being is on Motor
 * `category`
 * `added_days` - choices are 0, 3, 7, 14, 30, 90, or 180
 
-## Motors
+### Motors
 
 * `make` - a long list can be found in `regions.py`
 * `min_year` and `max_year`
@@ -60,6 +78,6 @@ Another thing to point out is that the main focus for the time being is on Motor
 * `cylinders` - 3, 4, 5, 6, 8, 10, or 12
 * `transmission` - automatic or manual
 
-# Issues
+## Issues
 
 Please use the [Issues](https://github.com/Cyph0n/dubizzle/issues) page for that.

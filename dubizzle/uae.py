@@ -119,7 +119,7 @@ class Results(object):
         # Make sure num_results is less than total results
         total_results = len(items) * num_pages
 
-        if self.num_results > total_results:
+        if self.num_results > total_results or self.num_results == 'all':
             self.num_results = total_results
 
         # Collect enough page urls to satisfy num_results
