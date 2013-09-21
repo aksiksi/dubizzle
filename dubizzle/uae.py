@@ -5,6 +5,7 @@ import re
 import math
 import multiprocessing
 import datetime
+from .helpers import parse_date
 from .regions import uae
 from bs4 import BeautifulSoup
 
@@ -84,6 +85,12 @@ class Search(object):
     def search(self):
         """Returns a Results object."""
         resp = requests.get(uae['base_url'], params=self.params, headers=headers)
+
+        # Retry if there's an ad and use given cookie
+        if 'interstitial' in resp.text:
+            search_base = re.match(r'^(.+)\?', resp.url).group(1)
+            resp = requests.get(search_base, params=self.params, headers=headers, cookies=resp.cookies)
+
         return Results(resp.text, self.num_results, resp.url)
 
 
@@ -110,9 +117,12 @@ class Results(object):
     def fetch(self):
         items = self.html.select('.listing-item')
 
+        if not items:
+            return []
+
         # Find total pages
         try:
-            num_pages = re.match(r'^\?page=(\d+)', self.html.select('.paging_forward > #last_page')[0]['href']).group(1)
+            num_pages = int(re.match(r'^\?page=(\d+)', self.html.select('.paging_forward > #last_page')[0]['href']).group(1))
         except IndexError:
             num_pages = 1
 
@@ -143,9 +153,6 @@ class Results(object):
         return self.parse(raw_results)
 
     def parse(self, raw_results):
-        if not raw_results:
-            return []
-
         for index, result in enumerate(raw_results):
             # Stop when requested result count is exceeded
             if index+1 > self.num_results:
@@ -154,7 +161,8 @@ class Results(object):
             # Don't try to understand the hacks below. I don't even... just hope they don't change the design :P
             parsed_result = {
                 'title': result.select('.title')[0].text.strip(),
-                'date': datetime.datetime.strptime(result.select('.date')[0].text.strip(), '%dth %B %Y'),
+                # 'date': datetime.datetime.strptime(result.select('.date')[0].text.strip(), '%dth %B %Y'),
+                'date': parse_date(result.select('.date')[0].text.strip()),
                 'url': re.match(r'^(.+)\?back', result.select('.title > a')[0]['href']).group(1),
                 'location': ' '.join(result.select('.location')[0].text.replace('\n', '').replace(u'\u202a', '')
                                      .split()).replace('Located : ', '').split(' > ')
