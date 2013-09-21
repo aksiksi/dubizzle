@@ -40,9 +40,8 @@ Another thing to point out is that the main focus for the time being is on Motor
 
 ## Examples
 
-### Find average price of year 2007 and above Nissan Altimas in Dubai
-
 ```python
+# Find average price of year 2007 and above Nissan Altimas in Dubai
 import dubizzle
 
 results = dubizzle.search(keyword='altima', country='uae', city='dubai', section='motors',
