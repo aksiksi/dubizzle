@@ -4,7 +4,6 @@ import requests
 import re
 import math
 import multiprocessing
-import datetime
 from .helpers import parse_date
 from .regions import uae
 from bs4 import BeautifulSoup
@@ -161,7 +160,6 @@ class Results(object):
             # Don't try to understand the hacks below. I don't even... just hope they don't change the design :P
             parsed_result = {
                 'title': result.select('.title')[0].text.strip(),
-                # 'date': datetime.datetime.strptime(result.select('.date')[0].text.strip(), '%dth %B %Y'),
                 'date': parse_date(result.select('.date')[0].text.strip()),
                 'url': re.match(r'^(.+)\?back', result.select('.title > a')[0]['href']).group(1),
                 'location': ' '.join(result.select('.location')[0].text.replace('\n', '').replace(u'\u202a', '')
