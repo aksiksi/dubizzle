@@ -53,7 +53,7 @@ total_price, result_count = 0, len(results)
 for result in results:
 	total_price += result['price']
 
-print float(total_price) / result_count // 39239.94 AED
+print float(total_price) / result_count // 39239.94
 ```
 
 ```python
