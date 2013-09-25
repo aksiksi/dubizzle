@@ -148,34 +148,34 @@ class Results(object):
 
             # Don't try to understand the hacks below. I don't even... just hope they don't change the design :P
             parsed_result = {
-                'title': result.select('.title')[0].text.strip(),
-                'date': parse_date(result.select('.date')[0].text.strip()),
-                'url': re.match(r'^(.+)\?back', result.select('.title > a')[0]['href']).group(1),
-                'location': ' '.join(result.select('.location')[0].text.replace('\n', '').replace(u'\u202a', '')
+                u'title': result.select('.title')[0].text.strip(),
+                u'date': parse_date(result.select('.date')[0].text.strip()),
+                u'url': re.match(r'^(.+)\?back', result.select('.title > a')[0]['href']).group(1),
+                u'location': ' '.join(result.select('.location')[0].text.replace('\n', '').replace(u'\u202a', '')
                                      .split()).replace('Located : ', '').split(' > ')
             }
 
             # Get price
             try:
-                parsed_result['price'] = int(result.select('.price')[0].text.strip().split(' ')[1].replace(',', ''))
+                parsed_result[u'price'] = int(result.select('.price')[0].text.strip().split(' ')[1].replace(',', ''))
             except IndexError:
-                parsed_result['price'] = 0
+                parsed_result[u'price'] = 0
 
             # Get the category
             try:
-                parsed_result['category'] = result.select('.description .breadcrumbs')[0].text.replace(u'\u202a', '').lstrip()\
+                parsed_result[u'category'] = result.select('.description .breadcrumbs')[0].text.replace(u'\u202a', '').lstrip()\
                                  .split('  >  ')
             except IndexError:
-                parsed_result['category'] = result.select('.descriptionindented .breadcrumbs')[0].text\
+                parsed_result[u'category'] = result.select('.descriptionindented .breadcrumbs')[0].text\
                                                   .replace(u'\u202a', '').lstrip().split('  >  ')
 
             # Get the image, if available
             image = result.select('.has_photo > .thumb > a > div')
 
             if result.select('.has_photo > .thumb > a > div'):
-                parsed_result['image'] = re.findall(r'\((.+)\)', image[0]['style'])[0]
+                parsed_result[u'image'] = re.findall(r'\((.+)\)', image[0]['style'])[0]
             else:
-                parsed_result['image'] = ''
+                parsed_result[u'image'] = ''
 
             # Get the features
             features = {}
@@ -198,7 +198,7 @@ class Results(object):
 
                         features[feature_name] = feature_value
 
-            parsed_result['features'] = features
+            parsed_result[u'features'] = features
 
             # Add dict to results list
             self.results.append(parsed_result)
