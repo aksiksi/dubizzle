@@ -2,6 +2,7 @@
 
 import re
 import datetime
+import requests
 
 
 def parse_date(date):
@@ -22,3 +23,13 @@ def parse_date(date):
 
     day, month, year = re.findall(r'(\d+)\w+ (\w+) (\w+)', date)[0]
     return datetime.date(year=int(year), month=months[month], day=int(day))
+
+
+def scrape(url):
+    resp = requests.get(url, headers=headers)
+    return resp.text
+
+headers = {
+    'User-Agent': 'SkyNet Version 4.4 Revision 12',
+    'Description': 'https://github.com/Cyph0n/dubizzle'
+}

@@ -4,24 +4,13 @@ import requests
 import re
 import math
 import multiprocessing
-from .helpers import parse_date
+from .helpers import parse_date, scrape, headers
 from .regions import uae
 from bs4 import BeautifulSoup
 
 
-headers = {
-    'User-Agent': 'SkyNet Version 4.4 Revision 12',
-    'Description': 'https://github.com/Cyph0n/dubizzle'
-}
-
-
 class SearchException(BaseException):
     pass
-
-
-def scrape(url):
-    resp = requests.get(url, headers=headers)
-    return resp.text
 
 
 class Search(object):
