@@ -27,12 +27,13 @@ Another thing to point out is that the main focus for the time being is on Dubiz
 		'url': 'test',
 		'image': 'http://...',
 		'price': 10000,
-		'date': datetime.datetime(2013, 07, 20, 0, 0, 0)
+		'date': datetime.datetime(2013, 07, 20, 0, 0, 0),
 		'features': {
 			'Color': 'black',
 			'Doors': 4,
 			'Kilometers': 35000
-		}
+		},
+		...
 	},
 	...
 ]
@@ -52,7 +53,7 @@ total_price, result_count = 0, len(results)
 for result in results:
 	total_price += result['price']
 
-print float(total_price) / result_count // 39239.94
+print float(total_price) / result_count // Prints 39239.94
 ```
 
 ```python
@@ -62,14 +63,14 @@ from collections import Counter
 colors = [result['features']['color'] for result in results]
 distribution = Counter(colors)
 
-print distribution['white'] // 52
+print distribution['white'] // Prints 52
 ```
 
 ## Search Parameters
 
 ### General
 
-* `country` - **required**
+* `country` - defaults to 'uae'
 * `keyword`
 * `city`
 * `section`
