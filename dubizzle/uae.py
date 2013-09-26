@@ -299,13 +299,3 @@ class Listing(object):
         self.listing[u'time'] = self.time
 
         return self.listing
-
-
-
-
-
-
-
-
-
-
