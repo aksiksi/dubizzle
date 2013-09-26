@@ -69,18 +69,13 @@ class Search(object):
         }
 
         self.num_results = kwargs.get('num_results', 50)
+        self.detailed = kwargs.get('detailed', False)
 
     def search(self):
         """Returns a Results object."""
         resp = dubizzle_request(uae['base_url'], headers, self.params)
-        # resp = requests.get(uae['base_url'], params=self.params, headers=headers)
-        #
-        # # Retry if there's an ad and use given cookie
-        # if 'interstitial' in resp.text:
-        #     search_base = re.match(r'^(.+)\?', resp.url).group(1)
-        #     resp = requests.get(search_base, params=self.params, headers=headers, cookies=resp.cookies)
 
-        return Results(resp.text, self.num_results, resp.url)
+        return Results(resp.text, self.num_results, resp.url, self.detailed)
 
 
 class Results(object):
@@ -97,10 +92,11 @@ class Results(object):
         A list of results each in dictionary format.
 
     """
-    def __init__(self, html, num_results, url):
+    def __init__(self, html, num_results, url, detailed):
         self.html = BeautifulSoup(html)
         self.num_results = num_results
         self.url = url
+        self.detailed = detailed
         self.results = []
         self.time = 0
 
