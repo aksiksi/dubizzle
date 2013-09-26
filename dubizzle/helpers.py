@@ -5,6 +5,21 @@ import datetime
 import requests
 
 
+def dubizzle_request(url, headers, params={}):
+    resp = requests.get(url, params=params, headers=headers)
+
+    # Retry if there's an ad and use given cookie
+    if 'interstitial' in resp.text:
+        # Make sure it's really an ad...
+        try:
+            search_base = re.match(r'^(.+)\?', resp.url).group(1)
+            resp = requests.get(search_base, params=params, headers=headers, cookies=resp.cookies)
+        except AttributeError:
+            pass
+
+    return resp
+
+
 def parse_date(date):
     months = {
         'January': 1,

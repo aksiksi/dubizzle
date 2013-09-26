@@ -1,10 +1,10 @@
 # Set of classes for interfacing with Dubizzle UAE
-
 import requests
 import re
 import math
 import multiprocessing
-from .helpers import parse_date, scrape, headers
+from time import time
+from .helpers import parse_date, scrape, headers, dubizzle_request
 from .regions import uae
 from bs4 import BeautifulSoup
 
@@ -72,12 +72,13 @@ class Search(object):
 
     def search(self):
         """Returns a Results object."""
-        resp = requests.get(uae['base_url'], params=self.params, headers=headers)
-
-        # Retry if there's an ad and use given cookie
-        if 'interstitial' in resp.text:
-            search_base = re.match(r'^(.+)\?', resp.url).group(1)
-            resp = requests.get(search_base, params=self.params, headers=headers, cookies=resp.cookies)
+        resp = dubizzle_request(uae['base_url'], headers, self.params)
+        # resp = requests.get(uae['base_url'], params=self.params, headers=headers)
+        #
+        # # Retry if there's an ad and use given cookie
+        # if 'interstitial' in resp.text:
+        #     search_base = re.match(r'^(.+)\?', resp.url).group(1)
+        #     resp = requests.get(search_base, params=self.params, headers=headers, cookies=resp.cookies)
 
         return Results(resp.text, self.num_results, resp.url)
 
@@ -101,8 +102,12 @@ class Results(object):
         self.num_results = num_results
         self.url = url
         self.results = []
+        self.time = 0
 
     def fetch(self):
+        # Track time
+        self.time = time()
+
         items = self.html.select('.listing-item')
 
         if not items:
@@ -152,7 +157,7 @@ class Results(object):
                 u'date': parse_date(result.select('.date')[0].text.strip()),
                 u'url': re.match(r'^(.+)\?back', result.select('.title > a')[0]['href']).group(1),
                 u'location': ' '.join(result.select('.location')[0].text.replace('\n', '').replace(u'\u202a', '')
-                                     .split()).replace('Located : ', '').split(' > ')
+                                .split()).replace('Located : ', '').split(' > ')
             }
 
             # Get price
@@ -163,8 +168,8 @@ class Results(object):
 
             # Get the category
             try:
-                parsed_result[u'category'] = result.select('.description .breadcrumbs')[0].text.replace(u'\u202a', '').lstrip()\
-                                 .split('  >  ')
+                parsed_result[u'category'] = result.select('.description .breadcrumbs')[0].text.replace(u'\u202a', '') \
+                                                   .lstrip().split('  >  ')
             except IndexError:
                 parsed_result[u'category'] = result.select('.descriptionindented .breadcrumbs')[0].text\
                                                   .replace(u'\u202a', '').lstrip().split('  >  ')
@@ -203,15 +208,108 @@ class Results(object):
             # Add dict to results list
             self.results.append(parsed_result)
 
+        self.time = time() - self.time
+        self.results[u'time'] = self.time
+
         return self.results
 
 
-# TODO: Work on this
 class Listing(object):
     """Represents a single Dubizzle UAE listing."""
     def __init__(self, url):
         self.url = url
         self.listing = {}
+        self.time = 0
 
     def fetch(self):
-        return requests.get(self.url)
+        # Track time
+        self.time = time()
+
+        # Get listing html
+        resp = dubizzle_request(self.url, headers)
+        soup = BeautifulSoup(resp.text)
+
+        # URL
+        self.listing[u'url'] = unicode(self.url)
+
+        # Title
+        self.listing[u'title'] = soup.select('.title')[0].text.strip()
+
+        # Photos, if found
+        photos = []
+
+        if soup.select('#photo-count'):
+            # Find photo count
+            num_photos = int(soup.select('#photo-count')[0].text.strip().split(' Photo')[0])
+
+            # Iterate through photo thumbs
+            for i in range(1, num_photos+1):
+                photo = soup.select('#thumb%d > a' % i)[0]
+                photos.append(photo['href'])
+
+        self.listing[u'photos'] = photos
+
+        # Location; too experimental to explain
+        raw_location = soup.select('.location')[0].text.replace('\n', '').replace('\t', '') \
+                           .replace(u'\u202a', '').replace(u'\xa0', '').strip().split(';')
+
+        location = [each.strip() for each in raw_location[0].split(' > ')]
+        near_to = [raw_location[1].strip()] if raw_location[1] else []
+
+        self.listing[u'location'] = location + near_to
+
+        # Google Maps URL
+        map_js = soup.select('.map-wrapper > script')[0].text
+        coordinates = re.findall(r'\.setCenter\((\S+)\);', map_js)[0]
+
+        self.listing[u'map'] = u'http://maps.google.com/?q=%s' % coordinates
+
+        # Phone number
+        self.listing[u'phone'] = soup.select('.phone-content')[0].text.strip().replace(u'\u202a', '')
+
+        # Post date
+        raw_date = soup.select('.listing-details-header > span')[0].text.split(': ')[1]
+        self.listing[u'date'] = parse_date(raw_date)
+
+        # Description
+        self.listing[u'description'] = soup.select('.trans_toggle_box')[0].text.strip()
+
+        # Details
+        raw_details = soup.select('#listing-details-list li')
+        parsed_details = {}
+
+        for detail in raw_details:
+            detail_text = detail.text.replace('\n', '').replace(u'\xa0', '').strip()
+
+            # For multi-part information
+            if ',' in detail_text:
+                split_detail = detail_text.split(':')
+                title, info = split_detail[0].lower(), [each.strip().lower() for each in split_detail[1].split(', ')]
+            else:
+                title, info = [each.strip().lower() for each in detail_text.split(':')]
+
+            # Try to convert to integer
+            try:
+                info = int(info)
+            except:
+                pass
+
+            # Store each detail
+            parsed_details[title] = info
+
+        self.listing[u'details'] = parsed_details
+
+        self.time = time() - self.time
+        self.listing[u'time'] = self.time
+
+        return self.listing
+
+
+
+
+
+
+
+
+
+

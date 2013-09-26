@@ -1,10 +1,10 @@
 from .regionmapper import mapper
 
 
-def search(**kwargs):
+def search(country='uae', **kwargs):
     """Simpler way to run a search on implemented Dubizzle sites. Please check respective site for parameters."""
     # Retrieve classes needed; defaults to UAE
-    Search, Results = mapper[kwargs.get('country', 'uae')].values()
+    Search, Results = mapper[country]['search'], mapper[country]['results']
 
     # Run search
     s = Search(**kwargs)
@@ -16,6 +16,12 @@ def search(**kwargs):
     return results
 
 
-def listing(country, url):
-    """Retrieve a single listing via URL."""
-    pass
+def listing(url, country='uae'):
+    """Retrieves a single Dubizzle UAE listing via URL."""
+    Listing = mapper[country]['listing']
+
+    # Create and fetch listing
+    l = Listing(url)
+    result = l.fetch()
+
+    return result

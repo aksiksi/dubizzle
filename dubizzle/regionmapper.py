@@ -6,5 +6,6 @@ mapper = {
     'uae': {
         'search': uae.Search,
         'results': uae.Results,
+        'listing': uae.Listing,
     }
 }
