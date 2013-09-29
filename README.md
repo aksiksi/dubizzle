@@ -15,6 +15,10 @@ Another thing to point out is that the main focus for the time being is on Dubiz
 * [BeautifulSoup](http://www.crummy.com/software/BeautifulSoup/)
 * Python 2.6+
 
+## Installation
+
+I've added the package to PyPI, so it can now be easily installed using `pip install dubizzle`.
+
 ## Quickstart
 
 ```python
