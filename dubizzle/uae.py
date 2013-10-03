@@ -98,7 +98,6 @@ class Results(object):
         self.url = url
         self.detailed = detailed
         self.results = []
-        self.time = 0
 
     def fetch(self):
         # Track time
@@ -203,9 +202,6 @@ class Results(object):
 
             # Add dict to results list
             self.results.append(parsed_result)
-
-        self.time = time() - self.time
-        self.results[u'time'] = self.time
 
         return self.results
 
