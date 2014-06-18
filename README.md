@@ -57,7 +57,7 @@ total_price, result_count = 0, len(results)
 for result in results:
 	total_price += result['price']
 
-print float(total_price) / result_count // Prints 39239.94
+print float(total_price) / result_count # Prints 39239.94
 ```
 
 ```python
@@ -67,7 +67,7 @@ from collections import Counter
 colors = [result['features']['color'] for result in results]
 distribution = Counter(colors)
 
-print distribution['white'] // Prints 52
+print distribution['white'] # Prints 52
 ```
 
 ```python
