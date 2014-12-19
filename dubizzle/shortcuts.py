@@ -1,6 +1,5 @@
 from .regionmapper import mapper
 
-
 def search(country='uae', **kwargs):
     """Simpler way to run a search on implemented Dubizzle sites. Please check respective site for parameters."""
     # Retrieve classes needed; defaults to UAE
@@ -14,7 +13,6 @@ def search(country='uae', **kwargs):
     results = raw.fetch()
 
     return results
-
 
 def listing(url, country='uae'):
     """Retrieves a single Dubizzle UAE listing via URL."""

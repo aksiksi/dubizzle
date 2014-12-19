@@ -1,5 +1,4 @@
 # Set of classes for interfacing with Dubizzle UAE
-import requests
 import re
 import math
 import multiprocessing
@@ -8,10 +7,8 @@ from .helpers import parse_date, scrape, headers, dubizzle_request
 from .regions import uae
 from bs4 import BeautifulSoup
 
-
 class SearchException(BaseException):
     pass
-
 
 class Search(object):
     """
@@ -76,7 +73,6 @@ class Search(object):
         resp = dubizzle_request(uae['base_url'], headers, self.params)
 
         return Results(resp.text, self.num_results, resp.url, self.detailed)
-
 
 class Results(object):
     """
@@ -146,86 +142,90 @@ class Results(object):
             if index+1 > self.num_results:
                 return self.results
 
-            # Don't try to understand the hacks below. I don't even... just hope they don't change the design :P
-            parsed_result = {
-                u'title': result.select('.title')[0].text.strip(),
-                u'date': parse_date(result.select('.date')[0].text.strip()),
-                u'url': re.match(r'^(.+)\?back', result.select('.title > a')[0]['href']).group(1),
-                u'location': ' '.join(result.select('.location')[0].text.replace('\n', '').replace(u'\u202a', '')
-                                .split()).replace('Located : ', '').split(' > ')
-            }
-
-            # Get price
+            # Skip any featured listings that cause parsing errors
             try:
-                parsed_result[u'price'] = int(result.select('.price')[0].text.strip().split(' ')[1].replace(',', ''))
-            except IndexError:
-                parsed_result[u'price'] = 0
+                # Don't try to understand the hacks below. I don't even... just hope they don't change the design :P
+                parsed_result = {
+                    u'title': result.select('.title')[0].text.strip(),
+                    u'date': parse_date(result.select('.date')[0].text.strip()),
+                    u'url': re.match(r'^(.+)\?back', result.select('.title > a')[0]['href']).group(1),
+                    u'location': ' '.join(result.select('.location')[0].text.replace('\n', '').replace(u'\u202a', '')
+                                    .split()).replace('Located : ', '').split(' > ')
+                }
 
-            # Get the category
-            try:
-                parsed_result[u'category'] = result.select('.description .breadcrumbs')[0].text.replace(u'\u202a', '') \
-                                                   .lstrip().split('  >  ')
-            except IndexError:
-                parsed_result[u'category'] = result.select('.descriptionindented .breadcrumbs')[0].text\
-                                                  .replace(u'\u202a', '').lstrip().split('  >  ')
+                # Get price
+                try:
+                    parsed_result[u'price'] = int(result.select('.price')[0].text.strip().split(' ')[1].replace(',', ''))
+                except IndexError:
+                    parsed_result[u'price'] = 0
 
-            # Get the image, if available
-            image = result.select('.has_photo > .thumb > a > div')
+                # Get the category
+                try:
+                    parsed_result[u'category'] = result.select('.description .breadcrumbs')[0].text.replace(u'\u202a', '') \
+                                                       .lstrip().split('  >  ')
+                except IndexError:
+                    parsed_result[u'category'] = result.select('.descriptionindented .breadcrumbs')[0].text\
+                                                      .replace(u'\u202a', '').lstrip().split('  >  ')
 
-            if result.select('.has_photo > .thumb > a > div'):
-                parsed_result[u'image'] = re.findall(r'\((.+)\)', image[0]['style'])[0]
-            else:
-                parsed_result[u'image'] = ''
+                # Get the image, if available
+                image = result.select('.has_photo > .thumb > a > div')
 
-            # Get the features
-            features = {}
+                if result.select('.has_photo > .thumb > a > div'):
+                    parsed_result[u'image'] = re.findall(r'\((.+)\)', image[0]['style'])[0]
+                else:
+                    parsed_result[u'image'] = ''
 
-            for feature in result.select('.features'):
-                data = feature.select('li')
+                # Get the features
+                features = {}
 
-                if data:
-                    for each in data:
-                        pair = each.text.split(': ')
-                        feature_name, feature_value = pair[0].lower(), pair[1].lower()
+                for feature in result.select('.features'):
+                    data = feature.select('li')
 
-                        if feature_name in ['kilometers', 'year']:
-                            if feature_value == 'none':
-                                feature_value = 0
+                    if data:
+                        for each in data:
+                            pair = each.text.split(': ')
+                            feature_name, feature_value = pair[0].lower(), pair[1].lower()
 
-                            feature_value = int(feature_value)
-                        elif feature_name == 'doors':
-                            feature_value = int(feature_value.split(' ')[0].rstrip('+'))
+                            if feature_name in ['kilometers', 'year']:
+                                if feature_value == 'none':
+                                    feature_value = 0
 
-                        features[feature_name] = feature_value
+                                feature_value = int(feature_value)
+                            elif feature_name == 'doors':
+                                feature_value = int(feature_value.split(' ')[0].rstrip('+'))
 
-            parsed_result[u'features'] = features
+                            features[feature_name] = feature_value
 
-            # Add dict to results list
-            self.results.append(parsed_result)
+                parsed_result[u'features'] = features
+
+                # Add dict to results list
+                self.results.append(parsed_result)
+            except:
+                continue
 
         return self.results
-
 
 class Listing(object):
     """Represents a single Dubizzle UAE listing."""
     def __init__(self, url):
         self.url = url
-        self.listing = {}
-        self.time = 0
 
     def fetch(self):
+        # Listing dict
+        listing = {}
+
         # Track time
-        self.time = time()
+        start = time()
 
         # Get listing html
         resp = dubizzle_request(self.url, headers)
         soup = BeautifulSoup(resp.text)
 
         # URL
-        self.listing[u'url'] = unicode(self.url)
+        listing[u'url'] = self.url
 
         # Title
-        self.listing[u'title'] = soup.select('.title')[0].text.strip()
+        listing[u'title'] = soup.select('.title')[0].text.strip()
 
         # Photos, if found
         photos = []
@@ -239,7 +239,7 @@ class Listing(object):
                 photo = soup.select('#thumb%d > a' % i)[0]
                 photos.append(photo['href'])
 
-        self.listing[u'photos'] = photos
+        listing[u'photos'] = photos
 
         # Location; too experimental to explain
         raw_location = soup.select('.location')[0].text.replace('\n', '').replace('\t', '') \
@@ -248,23 +248,23 @@ class Listing(object):
         location = [each.strip() for each in raw_location[0].split(' > ')]
         near_to = [raw_location[1].strip()] if raw_location[1] else []
 
-        self.listing[u'location'] = location + near_to
+        listing[u'location'] = location + near_to
 
         # Google Maps URL
         map_js = soup.select('.map-wrapper > script')[0].text
         coordinates = re.findall(r'\.setCenter\((\S+)\);', map_js)[0]
 
-        self.listing[u'map'] = u'http://maps.google.com/?q=%s' % coordinates
+        listing[u'map'] = u'http://maps.google.com/?q=%s' % coordinates
 
         # Phone number
-        self.listing[u'phone'] = soup.select('.phone-content')[0].text.strip().replace(u'\u202a', '')
+        listing[u'phone'] = soup.select('.phone-content')[0].text.strip().replace(u'\u202a', '')
 
         # Post date
         raw_date = soup.select('.listing-details-header > span')[0].text.split(': ')[1]
-        self.listing[u'date'] = parse_date(raw_date)
+        listing[u'date'] = parse_date(raw_date)
 
         # Description
-        self.listing[u'description'] = soup.select('.trans_toggle_box')[0].text.strip()
+        listing[u'description'] = soup.select('.trans_toggle_box')[0].text.strip()
 
         # Details
         raw_details = soup.select('#listing-details-list li')
@@ -289,9 +289,8 @@ class Listing(object):
             # Store each detail
             parsed_details[title] = info
 
-        self.listing[u'details'] = parsed_details
+        listing[u'details'] = parsed_details
 
-        self.time = time() - self.time
-        self.listing[u'time'] = self.time
+        listing[u'time'] = time() - start
 
-        return self.listing
+        return listing

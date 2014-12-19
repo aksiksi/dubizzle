@@ -1,9 +1,7 @@
 # Helper functions
-
 import re
 import datetime
 import requests
-
 
 def dubizzle_request(url, headers, params={}):
     resp = requests.get(url, params=params, headers=headers)
@@ -18,7 +16,6 @@ def dubizzle_request(url, headers, params={}):
             pass
 
     return resp
-
 
 def parse_date(date):
     months = {
@@ -38,7 +35,6 @@ def parse_date(date):
 
     day, month, year = re.findall(r'(\d+)\w+ (\w+) (\w+)', date)[0]
     return datetime.date(year=int(year), month=months[month], day=int(day))
-
 
 def scrape(url):
     resp = requests.get(url, headers=headers)

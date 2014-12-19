@@ -1,5 +1,4 @@
 # Maps sites to their respective classes
-
 from . import uae
 
 mapper = {

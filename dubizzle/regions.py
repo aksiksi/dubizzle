@@ -1,5 +1,4 @@
 # Contains region-specific attributes for Dubizzle sites
-
 uae = {
     'base_url': 'http://uae.dubizzle.com/search',
     'cities': {
