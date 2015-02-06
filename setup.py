@@ -10,7 +10,7 @@ setup(
 	author_email='cyph0nik@gmail.com',
 	url='https://github.com/Cyph0n/dubizzle/',
 	keywords=['dubizzle', 'scraping', 'API', 'search', 'classifieds'],
-	version='0.1.3',
+	version='0.1',
 	description='A scraping-based API for Dubizzle.',
 	long_description=long_description,
 	packages=['dubizzle'],
