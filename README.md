@@ -1,6 +1,6 @@
 ## Introduction
 
-[Dubizzle](http://www.dubizzle.com/) is an online classifieds website. This project aims to 
+[Dubizzle](http://www.dubizzle.com/) is an online classifieds website. This project aims to
 become a simple and complete scraping-based API for Dubizzle.
 
 ## Notice
@@ -74,7 +74,7 @@ print distribution['white'] # Prints 52
 # Retrieve a single listing from Dubizzle UAE
 import dubizzle
 
-listing = dubizzle.listing('http://dubai.dubizzle.com/motors/used-cars/nissan/tiida/2013/9/25/easy-installment-new-and-used-cars-0563276-2/?back=ZHViYWkuZHViaXp6bGUuY29tL21vdG9ycy91c2VkLWNhcnMv', country='uae')
+listing = dubizzle.listing('http://dubai.dubizzle.com/motors/used-cars/nissan/tiida/2013/9/25/easy-installment-new-and-used-cars-0563276-2/', country='uae')
 
 print listing
 ```

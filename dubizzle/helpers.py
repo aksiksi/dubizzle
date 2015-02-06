@@ -33,7 +33,7 @@ def parse_date(date):
         'December': 12
     }
 
-    day, month, year = re.findall(r'(\d+)\w+ (\w+) (\w+)', date)[0]
+    day, month, year = re.findall(r'(\d+) (\w+) (\w+)', date)[0]
     return datetime.date(year=int(year), month=months[month], day=int(day))
 
 def scrape(url):
