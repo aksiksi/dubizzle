@@ -1,3 +1,4 @@
 dubizzle/__pycache__
 MANIFEST
 dist/
+dubizzle/*.pyc
