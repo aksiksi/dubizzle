@@ -12,7 +12,7 @@ Prerequisites
 =============
 
 * `Requests <http://docs.python-requests.org/en/latest/index.html>`_
-* `BeautifulSoup <http://www.crummy.com/software/BeautifulSoup/>`_
+* `BeautifulSoup 4 <http://www.crummy.com/software/BeautifulSoup/>`_
 * Python 2.6+
 
 Quickstart

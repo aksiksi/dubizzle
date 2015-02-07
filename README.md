@@ -12,7 +12,7 @@ Another thing to point out is that the main focus for the time being is on Dubiz
 ## Prerequisites
 
 * [Requests](http://docs.python-requests.org/en/latest/index.html)
-* [BeautifulSoup](http://www.crummy.com/software/BeautifulSoup/)
+* [BeautifulSoup 4](http://www.crummy.com/software/BeautifulSoup/)
 * Python 2.6+
 
 ## Installation
