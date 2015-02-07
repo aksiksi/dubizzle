@@ -257,7 +257,7 @@ class Listing(object):
         listing[u'map'] = u'http://maps.google.com/?q=%s' % coordinates
 
         # Phone number
-        listing[u'phone'] = soup.select('.phone-content')[0].text.strip().replace(u'\u202a', '')
+        listing[u'phone'] = soup.find('div', {'class' : 'phone-content'}).contents[0].strip()[1:-1]
 
         # Post date
         raw_date = soup.select('.listing-details-header > span')[0].text.split(': ')[1]
