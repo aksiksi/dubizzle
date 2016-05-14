@@ -1,3 +1,7 @@
+## Update (14/05/2016)
+
+This library is no long actively maintained and is currently broken due to changes in Dubizzle's search URL structure. I may be doing a complete rewrite using either Scala or Python 3.5. Watch this space.
+
 ## Introduction
 
 [Dubizzle](http://www.dubizzle.com/) is an online classifieds website. This project aims to
